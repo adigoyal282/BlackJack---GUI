@@ -1,6 +1,7 @@
 import random
 from tkinter import *
-import cv2
+import time
+import tkinter.messagebox
 suits = ('hearts', 'diamonds', 'clubs', 'spades')
 numcards = ('ace', 'two','three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'jack', 'queen', 'king' )
 value = {'ace':11, 'two':2,'three':3, 'four':4, 'five':5, 'six':6, 'seven':7, 'eight':8, 'nine':9, 'ten':10, 'jack':10, 'queen':10, 'king':10 }
@@ -9,6 +10,7 @@ imgloc = {('hearts', 'ace'):"h1.png",('hearts', 'two'):"h2.png",('hearts', 'thre
 ('clubs', 'ace'):"c1.png",('clubs', 'two'):"c2.png",('clubs', 'three'):"c3.png",('clubs', 'four'):"c4.png",('clubs', 'five'):"c5.png",('clubs', 'six'):"c6.png",('clubs', 'seven'):"c7.png",('clubs', 'eight'):"c8.png",('clubs', 'ten'):"c10.png",('clubs', 'jack'):"cj.png",('clubs', 'queen'):"cq.png",('clubs', 'king'):"ck.png",('clubs', 'nine'):"c9.png",
 ('diamonds', 'ace'):"d1.png",('diamonds', 'two'):"d2.png",('diamonds', 'three'):"d3.png",('diamonds', 'four'):"d4.png",('diamonds', 'five'):"d5.png",('diamonds', 'six'):"d6.png",('diamonds', 'seven'):"d7.png",('diamonds', 'eight'):"d8.png",('diamonds', 'ten'):"d10.png",('diamonds', 'jack'):"dj.png",('diamonds', 'queen'):"dq.png",('diamonds', 'king'):"dk.png",('diamonds', 'nine'):"d9.png"
 }
+#We can slice up the python window in multiple frames by using Frame key word
 
 playing  = True
 
@@ -36,65 +38,72 @@ class Hand:
 		self.aces = 0
 	def add_card(self, card):
 		self.cards.append(card)
+		self.val += value[card.numcard]
 		if card.numcard == 'ace':
 			self.aces += 1
-		self.val += value[card.numcard]
-		self.img = PhotoImage(file =imgloc[(card.suit, card.numcard)])
-		self.label = Label(BlackJack, image = self.img)	
-		self.label.pack()
+
+
 	def adjust_ace(self):
 		if self.aces > 0 and self.val > 21:
 			self.aces -= 1
 			self.val -= 10
+i = 1
 
-			
-hitpass = False
-def hitorpass():
-	if hitpass == True:
-		user_hand.add_card(yo.pop_card())
-def check_win():
-	if user_hand.val > cpu_hand.val and user_hand.val <= 21:
-		return True
-	elif user_hand.val == cpu_hand.val:
-		return True 
-	else:
-		return False
+
+
+BlackJack = Tk()
+BlackJack.title('BlackJack - Aditya')
 
 yo = Deck()
 user_hand = Hand()
 cpu_hand = Hand()
 yo.shuffle()
-BlackJack = Tk()
-BlackJack.title('BlackJack - Aditya')
 user_hand.add_card(yo.pop_card())
-img1 = PhotoImage(file=imgloc[(user_hand.cards.suit, user_hand.cards.numcard)])
+img1 = PhotoImage(file=imgloc[(user_hand.cards[0].suit, user_hand.cards[0].numcard)])
 label1 = Label(BlackJack, image = img1)
-label1.pack(side = 'bottom')
+label1.grid(column = 0, row = 4)
 
 user_hand.add_card(yo.pop_card())
-img2 = PhotoImage(file=imgloc[(user_hand.cards.suit, user_hand.cards.numcard)])
+img2 = PhotoImage(file=imgloc[(user_hand.cards[1].suit, user_hand.cards[1].numcard)])
 label2 = Label(BlackJack, image = img2)
-label2.pack(side ='bottom')
+label2.grid(column = 1, row = 4)
 
-user_hand.add_card(yo.pop_card())
-img3 = PhotoImage(file=imgloc[(user_hand.cards.suit, user_hand.cards.numcard)])
-label3 = Label(BlackJack, image = img3)
-label3.pack(side = 'bottom')
+def presshit():
+	global i
+	user_hand.add_card(yo.pop_card())
+	img3 = PhotoImage(file=imgloc[(user_hand.cards[2].suit, user_hand.cards[2].numcard)])
+	
+	label3 = Label(BlackJack, image = img3)
+	label3.grid(column = 2, row = 4)
+	
+	i += 1
 
+def check_win():
+	if (user_hand.val > cpu_hand.val) and user_hand.val<=21:
+		tkinter.messagebox.showinfo('User Won')
+	elif user_hand.val == cpu_hand.val:
+		tkinter.messagebox.showinfo('Game Tied')
+	else:
+		tkinter.messagebox.showinfo('CPU Won')
+	
+
+	
 cpu_hand.add_card(yo.pop_card())
-img4 = PhotoImage(file=imgloc[(cpu_hand.cards.suit, cpu_hand.cards.numcard)])
+img4 = PhotoImage(file=imgloc[(cpu_hand.cards[0].suit, cpu_hand.cards[0].numcard)])
 label4 = Label(BlackJack, image = img4)
-label4.pack(side = 'top')
+label4.grid(column = 0, row = 1)
 
 cpu_hand.add_card(yo.pop_card())
-img5 = PhotoImage(file=imgloc[(cpu_hand.cards.suit, cpu_hand.cards.numcard)])
+img5 = PhotoImage(file=imgloc[(cpu_hand.cards[1].suit, cpu_hand.cards[1].numcard)])
 label5 = Label(BlackJack, image = img5)
-label5.pack(side = 'top')
+label5.grid(column = 1, row = 1)
 
+hit = Button(BlackJack, text = "HIT",fg = "green", command =lambda: presshit())
+hit.grid(column=0, row = 2)
 
-hit = Button(BlackJack, text = "HIT", command= user_hand.add_card(yo.pop_card()))
-hit.pack(side='left')
+leave = Button(BlackJack, text="PASS", fg="red", command =lambda: check_win())
+leave.grid(column=1, row= 2)
 
-leave = Button(BlackJack, text="PASS")
-leave.pack()
+	
 BlackJack.mainloop()
+print(i)
